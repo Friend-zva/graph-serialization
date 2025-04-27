@@ -1,0 +1,52 @@
+name: Main Actions
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  linter:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v3
+
+      - name: Run fourmolu
+        uses: haskell-actions/run-fourmolu@v11
+        with:
+          version: "0.15.0.0"
+
+      - name: Set up HLint
+        uses: haskell-actions/hlint-setup@v2
+
+      - name: Run HLint
+        uses: haskell-actions/hlint-run@v2
+        with:
+          path: .
+          fail-on: warning
+
+  run:
+    name: Build and test
+    needs: linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v3
+
+      - name: Install requirements
+        run: |
+          sudo apt update
+          sudo apt -y install haskell-stack
+          stack setup
+
+      - name: Build
+        run: stack build
+
+      - name: Run tests
+        run: stack test
