@@ -8,14 +8,14 @@ toDotGraph graph =
         ("digraph " ++ name ++ " {")
             : (tab ++ "node [shape=circle];")
             : map toDotVertex (vertices graph)
-            ++ map toEdgeDot (edges graph)
+            ++ map toDotEdge (edges graph)
             ++ ["}"]
   where
     name = label graph
     tab = "  "
 
-    toEdgeDot :: (Show t) => Edge t -> String
-    toEdgeDot e =
+    toDotEdge :: (Show t) => Edge t -> String
+    toDotEdge e =
         tab
             ++ show (idVSource e)
             ++ " -> "
